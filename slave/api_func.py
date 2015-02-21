@@ -10,7 +10,7 @@ class MugenDBAPI:
 	def put(self,data,keylocation,userid):
 		for key in data.keys():
 			if key in keylocation:
-				print "Error: key {0} already exists".format(key)
+				print "Error: key '{0}' already exists".format(key)
 				return -1
 			else:
 				with open(self.dbfile,'ab+') as dbf:
@@ -19,7 +19,7 @@ class MugenDBAPI:
 					json.dump(data,dbf)
 					dbf.write("\n")
 					keylocation[key] = [userid,offset]
-					print "Success: Added {0}".format(data)
+					print "Success: Added '{0}'".format(data)
 					return 0
 
 	def get(self,key,keylocation,userid):
@@ -27,14 +27,14 @@ class MugenDBAPI:
 			'''
 			For access control policy
 			if userid != keylocation[key][0]:
-				return "Error: No access to key {0}".format(key)
+				return "Error: No access to key '{0}'".format(key)
 			'''
 			with open(self.dbfile,'rb') as dbf:
 				dbf.seek(keylocation[key][1],0)
 				self.readbuff = dbf.readline()
 				return json.loads(self.readbuff)
 		else:
-			print "Error: Key {0} does not exists".format(key)
+			print "Error: Key '{0}' does not exists".format(key)
 			return -1
 
 	def deleteline(self,infile,seekpoint,keylocation):
@@ -58,7 +58,7 @@ class MugenDBAPI:
 				'''
 				For access control policy
 				if userid != keylocation[key][0]:
-				return "Error: No access to key {0}".format(key)
+				return "Error: No access to key '{0}'".format(key)
 				'''
 				seekpoint = keylocation[key][1]
 				self.deleteline(self.dbfile,seekpoint,keylocation)
@@ -67,7 +67,7 @@ class MugenDBAPI:
 					offset = dbf.tell()
 					json.dump(data,dbf)
 					keylocation[key][1] = offset 
-					print "Success: Updated {0} with {1}".format(key,data[key])
+					print "Success: Updated key '{0}' with '{1}'".format(key,data[key])
 					return 0
 		else:
 			print "Error: Key {0} does not exists".format(key)
@@ -78,15 +78,15 @@ class MugenDBAPI:
 			'''
 			For access control policy
 			if userid != keylocation[key][0]:
-				return "Error: No access to key {0}".format(key)
+				return "Error: No access to key '{0}'".format(key)
 			'''
 			seekpoint = keylocation[key][1]
 			self.deleteline(self.dbfile,seekpoint,keylocation)
 			keylocation.pop(key,None)
-			print "Success: Deleted key {0}".format(key)
+			print "Success: Deleted key '{0}'".format(key)
 			return 0
 		else:
-			print "Error: Key {0} does not exists".format(key)
+			print "Error: Key '{0}' does not exists".format(key)
 			return -1
 
 if __name__ == "__main__":
@@ -100,6 +100,7 @@ if __name__ == "__main__":
 	dbcaller.put(data, keylocation, userid)
 	print keylocation
 	dbcaller.put({'address':'raleigh'}, keylocation, userid)
+	dbcaller.put({'address':'new york'}, keylocation, userid)
 	print keylocation
 	print dbcaller.get('address', keylocation, userid)
 	data = {'name':'ankit'}
