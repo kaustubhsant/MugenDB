@@ -1,8 +1,9 @@
 import socket
 import threading
 import thread
-from multiprocessing import Pool
-
+from multiprocessing.pool import ThreadPool
+from datetime import time
+import json
 
 class MasterSlaveConnection:
     def __init__(self,portNumber):
@@ -17,15 +18,17 @@ class MasterSlaveConnection:
                 print endpoint
                 self.masters[name] = endpoint
         myfile.close()
-        
+        self.pool = ThreadPool(10) #TODO : configure this
+        self.keylocation = {}
+
     def listen(self):
 	print 'listening....' #TODO : log this
+	self.pool.apply_async(savekeymap,args=(self.keylocation,))
 	while True:
    	    data, addr = self.sock.recvfrom(1024)
-            if threading.activeCount() < 10 : #make this configurable
-	        thread.start_new_thread(ServeRequest,(data,self.masters))
-            
-    
+    	    self.pool.apply_async(ServeRequest, args=(data,self.masters,))
+
+
 def ServeRequest(data,masters):
 	print data
         masterNode,request = data.partition(" ")[::2]
@@ -34,6 +37,13 @@ def ServeRequest(data,masters):
         host,port = masters[masterNode].partition(":")[::2]
 	sock.sendto('Success', (host,int(port)))
         sock.close()
+
+def savekeymap(keylocation=None):
+    keymapfile = "KeyMap.txt"
+    while True:
+        with open(keymapfile,'w') as kf:
+            json.dump(keylocation,kf)
+        time.sleep(10)
     
-#s=MasterSlaveConnection(12345)
-#s.listen()
+s=MasterSlaveConnection(12345)
+s.listen()
