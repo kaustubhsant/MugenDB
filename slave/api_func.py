@@ -36,7 +36,8 @@ class MugenDBAPI:
 		else:
 			print "Error: Key '{0}' does not exists".format(key)
 			return -1
-
+	
+	'''
 	def deleteline(self,infile,seekpoint,keylocation):
 		with open(infile,'r') as fre:
 			fre.seek(seekpoint,0)
@@ -51,7 +52,8 @@ class MugenDBAPI:
 					keylocation[key][1] = offset
 					line = fre.readline()
 				fwr.truncate()
-
+	'''
+	
 	def update(self,data,keylocation,userid):
 		for key in data.keys():
 			if key in keylocation:
@@ -60,8 +62,8 @@ class MugenDBAPI:
 				if userid != keylocation[key][0]:
 				return "Error: No access to key '{0}'".format(key)
 				'''
-				seekpoint = keylocation[key][1]
-				self.deleteline(self.dbfile,seekpoint,keylocation)
+				#seekpoint = keylocation[key][1]
+				#self.deleteline(self.dbfile,seekpoint)
 				with open(self.dbfile,'ab+') as dbf:
 					dbf.seek(0,2)
 					offset = dbf.tell()
@@ -80,8 +82,8 @@ class MugenDBAPI:
 			if userid != keylocation[key][0]:
 				return "Error: No access to key '{0}'".format(key)
 			'''
-			seekpoint = keylocation[key][1]
-			self.deleteline(self.dbfile,seekpoint,keylocation)
+			#seekpoint = keylocation[key][1]
+			#self.deleteline(self.dbfile,seekpoint)
 			keylocation.pop(key,None)
 			print "Success: Deleted key '{0}'".format(key)
 			return 0
