@@ -3,7 +3,8 @@ import threading
 import thread
 from multiprocessing.pool import ThreadPool
 from datetime import time
-import json
+import json	
+from api_func import MugenDBAPI
 
 class MasterSlaveConnection:
     def __init__(self,portNumber):
@@ -19,23 +20,30 @@ class MasterSlaveConnection:
                 self.masters[name] = endpoint
         myfile.close()
         self.pool = ThreadPool(10) #TODO : configure this
-        self.keylocation = {}
 
     def listen(self):
 	print 'listening....' #TODO : log this
 	self.pool.apply_async(savekeymap,args=(self.keylocation,))
 	while True:
-   	    data, addr = self.sock.recvfrom(1024)
-    	    self.pool.apply_async(ServeRequest, args=(data,self.masters,))
+   	    request, addr = self.sock.recvfrom(1024)
+    	    self.pool.apply_async(ServeRequest, args=(request,self.masters,))
 
 
-def ServeRequest(data,masters):
-	print data
-        masterNode,request = data.partition(" ")[::2]
-        #call apis here
+def ServeRequest(request,masters):
+        masterNode,userid,action,data = request.split(" ")
+        #call apis here	
+        api=MugenDBAPI()
+	if action == "put":
+	    val = api.put(data,userid)
+	elif action == "get":
+	    val=api.get(data,userid)
+	elif action == "update":
+	    val=api.update(data,userid)
+	elif action == "delete":
+	    val=api.delete(data,userid)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         host,port = masters[masterNode].partition(":")[::2]
-	sock.sendto('Success', (host,int(port)))
+	sock.sendto(val, (host,int(port)))
         sock.close()
 
 def savekeymap(keylocation=None):
