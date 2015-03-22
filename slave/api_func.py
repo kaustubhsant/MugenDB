@@ -112,4 +112,3 @@ if __name__ == "__main__":
 	dbcaller.delete('name',keylocation)
 	print keylocation
 	
-	
