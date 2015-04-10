@@ -7,6 +7,7 @@ import json
 from api_func import MugenDBAPI
 import logging
 import time
+import traceback
 
 #intialize logging
 log_filename = 'logs/'+'slave-log.txt'
@@ -37,23 +38,30 @@ class MasterSlaveConnection:
 
 
 def ServeRequest(request,masters,keylocation):
-        masterNode,userid,action,data = request.split(" ")
-        #call apis here	
-	logger.debug('Processing '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data)
-        api=MugenDBAPI()
-	if action == "put":
-	    val = api.put(data,keylocation,userid)
-	elif action == "get":
-	    val=api.get(data,keylocation,userid)
-	elif action == "update":
-	    val=api.update(data,keylocation,userid)
-	elif action == "delete":
-	    val=api.delete(data,keylocation,userid)
-	logger.debug('Processed succesfully: '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data+' ,return= '+val)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        host,port = masters[masterNode].partition(":")[::2]
-	sock.sendto(val, (host,int(port)))
-        sock.close()
+    	try:
+		masterNode,userid,action,data = request.split(" ")
+		#call apis here	
+		logger.debug('Processing '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data)
+		api=MugenDBAPI()
+		if action == "put":
+		    jsondata = {data.split(":")[0]:data.split(":")[1]}
+		    val = api.put(jsondata,keylocation,userid)
+		elif action == "get":
+		    val=api.get(data,keylocation,userid)
+		elif action == "update":
+		    jsondata = {data.split(":")[0]:data.split(":")[1]}
+		    val=api.update(data,keylocation,userid)
+		elif action == "delete":
+		    val=api.delete(data,keylocation,userid)
+	
+		logger.debug('Processed succesfully: '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data+' ,return= '+str(val))
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		host,port = masters[masterNode].partition(":")[::2]
+		print host,port,val
+		sock.sendto(str(val), (host,int(port)))
+		sock.close()
+	except:
+		print (traceback.format_exc())
 
 if __name__ == "__main__":    
 	s=MasterSlaveConnection(12345)
