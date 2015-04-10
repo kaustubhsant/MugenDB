@@ -75,7 +75,7 @@ class MugenDBAPI:
             print "Error: Key {0} does not exists".format(key)
             return -1
 
-    def delete(self,key,keylocation):
+    def delete(self,key,keylocation,userid):
         if key in keylocation:
             '''
             For access control policy
