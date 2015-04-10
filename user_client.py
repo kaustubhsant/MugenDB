@@ -15,12 +15,18 @@ port = 13464
 s.connect((host, port))
 s.send(user_details)
 print s.recv(1024)
-request = raw_input('Enter your request ')
-s.send(request)
+request = raw_input('Enter your request: ')
+if str(request) =="put" :
+	user_input=raw_input("Enter key and value: ")
+if str(request)=="delete" :
+	user_input=raw_input("Enter key: ")
+if str(request)=="update" :
+	user_input=raw_input("Enter key and value: ")
+if str(request)=="get" :
+	user_input=raw_input("Enter key: ")
+
+input_to_monitor = request+ '@' + user_input
+s.send(input_to_monitor)
 print s.recv(1024)
-key = raw_input('Key: ')
-value = raw_input('Value: ')
-key_value_pair = key + '#' + value
-s.send(key_value_pair)
 s.close          
 
