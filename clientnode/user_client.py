@@ -1,9 +1,6 @@
 import sys
-
 import hashlib
-
 import getpass
-
 import socket
 
 user_name = raw_input('Please enter username: ')
