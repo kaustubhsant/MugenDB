@@ -13,10 +13,8 @@ class MugenDBAPI:
     	with open(infile,'r+') as fwr:
 	   	fwr.seek(seekpoint,0)
         	line = fwr.readline()
-		print line
 		newline = "!" 
 		newline = line[0:2] + newline + line[3:]
-		print "marked " + newline
    		fwr.seek(seekpoint,0)
         	fwr.write(newline.strip())
     
