@@ -1,6 +1,4 @@
 import sys
-#import hashlib
-#import getpass
 import socket
 import json
 
@@ -21,7 +19,7 @@ s.send(json.dumps(user_details))
 while(attempts <= 3):
 	attempts = attempts + 1 
 	if s.recv(1024) == "Login failed" :
-	    username = raw_input('Please enter username: ')
+	    username = raw_input('Please enter username:')
 	    userpassword = raw_input('Please Enter Password:')
 	    user_details['username'] = username
 	    user_details['password'] = userpassword
@@ -32,7 +30,7 @@ while(attempts <= 3):
 if attempts >3:
     sys.exit(1)
 	
-request = raw_input('Enter your request: ')
+request = raw_input('Enter your request:')
 
 input_to_monitor['userid'] = username
 input_to_monitor['request'] = request
@@ -54,7 +52,6 @@ if str(request)=="delete" :
 	userinput=raw_input("Enter key: ")
 	input_to_monitor['data'] = userinput
 
-#input_to_monitor = request+ '@' + user_input
 s.send(json.dumps(input_to_monitor))
 print s.recv(1024)
 s.close          
