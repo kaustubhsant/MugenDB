@@ -1,0 +1,2 @@
+Slave1=localhost:10001
+Slave2=localhost:10002
