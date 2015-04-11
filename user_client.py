@@ -11,11 +11,11 @@ user_password = raw_input('Please Enter Password:')
 user_details = user_name + ',' + user_password
 s = socket.socket()
 host = socket.gethostname();
-port = 13464
+port = 13465
 s.connect((host, port))
 s.send(user_details)
 print s.recv(1024)
-request = raw_input('Enter your request: ')
+request = raw_input('Enter your request ')
 if str(request) =="put" :
 	user_input=raw_input("Enter key and value: ")
 if str(request)=="delete" :
