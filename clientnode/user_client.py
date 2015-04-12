@@ -19,7 +19,7 @@ def request_input(request):
 	elif str(request)=="delete" :
 		userinput=raw_input("Enter key: ")
 		input_to_monitor['data'] = userinput
-	elif str(request) == "No":
+	elif str(request) == "Logout":
 		print "disconnecting"
 		return -1
 	else:
@@ -42,9 +42,11 @@ port = 13464
 s.connect((host, port))
 s.send(json.dumps(user_details))
 
-while(attempts <= 3):
-	attempts = attempts + 1 
+while(attempts < 3):
 	if s.recv(1024) == "Login failed" :
+	    attempts = attempts + 1
+	    if attempts == 3:
+		sys.exit(1)
 	    username = raw_input('Please enter username:')
 	    userpassword = raw_input('Please Enter Password:')
 	    user_details['username'] = username
@@ -53,20 +55,21 @@ while(attempts <= 3):
 	else:
 	    break
 
-if attempts >3:
-    sys.exit(1)
-
 request = raw_input('Enter your request:')
 
 result = request_input(request)
-while(result == 0):
-	input_to_monitor['userid'] = username
-	input_to_monitor['request'] = request
-	s.send(json.dumps(input_to_monitor))
-	print s.recv(1024)
+while(1):
+	if result == -1:
+		input_to_monitor['request'] = request
+		s.send(json.dumps(input_to_monitor))
+		break
+	elif result == 0:
+		input_to_monitor['userid'] = username
+		input_to_monitor['request'] = request
+		s.send(json.dumps(input_to_monitor))
+		print s.recv(1024)
         request = raw_input('Enter your request:')
         result = request_input(request)
-
 s.close()          
 
 
