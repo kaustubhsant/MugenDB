@@ -19,6 +19,9 @@ def request_input(request):
 	elif str(request)=="delete" :
 		userinput=raw_input("Enter key: ")
 		input_to_monitor['data'] = userinput
+	elif str(request) == "No":
+		print "disconnecting"
+		return -1
 	else:
 		print 'wrong input'
 		return 1
@@ -52,19 +55,18 @@ while(attempts <= 3):
 
 if attempts >3:
     sys.exit(1)
-	
+
 request = raw_input('Enter your request:')
 
 result = request_input(request)
-while result:
-	request = raw_input('Enter your request:')
-	result = request_input(request)
+while(result == 0):
+	input_to_monitor['userid'] = username
+	input_to_monitor['request'] = request
+	s.send(json.dumps(input_to_monitor))
+	print s.recv(1024)
+        request = raw_input('Enter your request:')
+        result = request_input(request)
 
-input_to_monitor['userid'] = username
-input_to_monitor['request'] = request
-
-s.send(json.dumps(input_to_monitor))
-print s.recv(1024)
 s.close()          
 
 
