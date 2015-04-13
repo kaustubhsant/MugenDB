@@ -8,6 +8,7 @@ from api_func import MugenDBAPI
 import logging
 import time
 import traceback
+import os
 
 #intialize logging
 log_filename = 'logs/'+'slave-log.txt'
@@ -16,6 +17,10 @@ logger = logging.getLogger('MasterSlaveConnection.py')
 keylocation = {}
 
 class MasterSlaveConnection:
+    ''' Class to setup listening port and receive requests
+	and assign a thread from threadpool to process request'''
+
+  
     def __init__(self,portNumber):
         self.portNumber = portNumber
 	self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
@@ -38,6 +43,9 @@ class MasterSlaveConnection:
 
 
 def ServeRequest(request,masters,keylocation):
+	''' Process the request and return result '''
+
+
     	try:
 		masterNode,userid,action,data = request.split(" ")
 		#call apis here	
@@ -63,6 +71,18 @@ def ServeRequest(request,masters,keylocation):
 	except:
 		print (traceback.format_exc())
 
+def loadkeymap():
+	'''Load the keymap from file '''
+
+
+	global keylocation 
+	if os.path.isfile("KeyMap.txt"):
+		with open("KeyMap.txt",'r') as keyfin:
+			for line in keyfin:
+				keylocation[line.strip().split(":")[0]] = line.strip().split(":")[1]
+	#print keylocation
+
 if __name__ == "__main__":    
+	loadkeymap()
 	s=MasterSlaveConnection(12345)
 	s.listen()
