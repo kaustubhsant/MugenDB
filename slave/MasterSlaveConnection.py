@@ -9,12 +9,15 @@ import logging
 import time
 import traceback
 import os
+from daemon_monitor import Monitor
 
 #intialize logging
 log_filename = 'logs/'+'slave-log.txt'
 logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('MasterSlaveConnection.py')
 keylocation = {}
+num_of_requests = 0
+threshold = 0
 
 class MasterSlaveConnection:
     ''' Class to setup listening port and receive requests
@@ -27,11 +30,16 @@ class MasterSlaveConnection:
 	self.host = socket.gethostname()               
 	self.sock.bind((self.host, self.portNumber)) 
         self.masters = dict()
+	self.monitors = dict()
         with open("config/masters.txt") as myfile:
             for line in myfile:
                 name, endpoint = line.partition("=")[::2]
                 self.masters[name] = endpoint
-        myfile.close()
+	
+        with open("config/monitors.txt") as myfile:
+            for line in myfile:
+                name, endpoint = line.partition("=")[::2]
+                self.monitors[name] = endpoint
         self.pool = ThreadPool(10) #TODO : configure this
 
     def listen(self):
@@ -40,7 +48,16 @@ class MasterSlaveConnection:
 	while True:
    	    request, addr = self.sock.recvfrom(1024)
     	    self.pool.apply_async(ServeRequest, args=(request,self.masters,keylocation))
+	    global num_of_requests
+	    num_of_requests=num_of_requests+1
+	    if num_of_requests > threshold:
+	       host,port = self.monitors[getMonitor()].partition(":")[::2]
+               mon = Monitor(host,int(port),'False')
+               mon.senddata('threshold')
+               mon.closeconnection
 
+def getMonitor():
+	return 'Monitor1'
 
 def ServeRequest(request,masters,keylocation):
 	''' Process the request and return result '''
@@ -68,6 +85,8 @@ def ServeRequest(request,masters,keylocation):
 		print host,port,val
 		sock.sendto(str(val), (host,int(port)))
 		sock.close()
+                global num_of_requests
+                num_of_requests=num_of_requests-1
 	except:
 		print (traceback.format_exc())
 
