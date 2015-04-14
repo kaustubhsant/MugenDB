@@ -1,0 +1,9 @@
+DEBUG:root:got req
+DEBUG:root:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+DEBUG:root:got req
+DEBUG:root:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+DEBUG:MasterSlaveConnection.py:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+DEBUG:MasterSlaveConnection.py:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+DEBUG:MasterSlaveConnection.py:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+DEBUG:MasterSlaveConnection.py:Processing put request from master Master1 ,userid=nchinth ,data=key,value
+2015-04-03 20:07:51,197 - MasterSlaveConnection.py - DEBUG - Processing put request from master Master1 ,userid=nchinth ,data=key,value
