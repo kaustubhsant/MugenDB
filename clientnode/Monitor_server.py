@@ -5,12 +5,13 @@ import select
 import sys
 import threading
 import thread
+from threading import Thread, Lock
 from multiprocessing.pool import ThreadPool
 import json
 
-number_of_masters = 3
+number_of_masters = 2
 masters = dict()
-threshold = {'Master1':'No','Master2':'No','Master3':'No'}
+threshold = {'Master1':'No','Master2':'No'}
 i = 0
 
 def thresholdListen():
@@ -29,15 +30,18 @@ def thresholdListen():
 class Server:
 	def __init__(self): 
 		self.host = ''
-        	self.port = 13464
+        	self.port = 13465
         	self.backlog = 5
         	self.size = 1024
         	self.server = None
 		self.pool = ThreadPool(10)
-		with open("config/masters.txt") as myfile:
-		for line in myfile:
-			name, endpoint = line.partition("=")[::2]
-			masters[name] = endpoint
+		with open("../config/masters.txt") as myfile:
+			for line in myfile:
+				name, endpoint = line.partition("=")[::2]
+				masters[name] = endpoint
+		#name = "Master1"
+		#endpoint = "localhost:10003"
+			
 
 	def open_socket(self):
 
@@ -123,7 +127,7 @@ if __name__ == "__main__":
 
 	conn = sqlite3.connect('authentication_info.db')
 	c = conn.cursor()
-#	c.execute('''DROP TABLE user_info''')
+	c.execute('''DROP TABLE user_info''')
 	c.execute("CREATE TABLE user_info (username text, password text)")
 	c.execute("INSERT INTO user_info values('shashank','goud')")
 	c.execute("INSERT INTO user_info values('ankit','bhandari')")
