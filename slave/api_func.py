@@ -22,8 +22,8 @@ class MugenDBAPI:
 	import fileinput
 	file = fileinput.input(infile, inplace=True)
 	for line in file:
-     	    if key not in line:
-       		print line
+     	    if key != line.split(":")[0]:
+       		print line.strip()
 
     def put(self,data,keylocation,userid):
         for key in data.keys():
@@ -73,7 +73,7 @@ class MugenDBAPI:
                     	offset = dbf.tell()
                     	json.dump(data,dbf)
                     	keylocation[key][1] = offset 
-			keyfin.write("{}:{}\n".format(key,keylocation[key]))
+			keyfin.write("{}:{}\n".format(key,keylocation[key]))			
                     	print "Success: Updated key '{0}' with '{1}'".format(key,data[key])
                     	return 0
             else:
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     print "After put " + str(keylocation)
     dbcaller.put({'address':'raleigh'}, keylocation, userid)
     print "After put " + str(keylocation)
-    dbcaller.put({'address':'new york'}, keylocation, userid)
+    dbcaller.put({'aname':'new york'}, keylocation, userid)
     print dbcaller.get('address', keylocation, userid)
     data = {'name':'ankit'}
     dbcaller.update(data, keylocation, userid)

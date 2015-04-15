@@ -35,14 +35,13 @@ class Server:
         	self.size = 1024
         	self.server = None
 		self.pool = ThreadPool(10)
-		with open("../config/masters.txt") as myfile:
+		with open("config/masters.txt") as myfile:
 			for line in myfile:
 				name, endpoint = line.partition("=")[::2]
 				masters[name] = endpoint
 		#name = "Master1"
 		#endpoint = "localhost:10003"
 			
-
 	def open_socket(self):
 
 		self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -127,7 +126,7 @@ if __name__ == "__main__":
 
 	conn = sqlite3.connect('authentication_info.db')
 	c = conn.cursor()
-	c.execute('''DROP TABLE user_info''')
+	#c.execute('''DROP TABLE user_info''')
 	c.execute("CREATE TABLE user_info (username text, password text)")
 	c.execute("INSERT INTO user_info values('shashank','goud')")
 	c.execute("INSERT INTO user_info values('ankit','bhandari')")

@@ -71,5 +71,3 @@ while(1):
         request = raw_input('Enter your request:')
         result = request_input(request)
 s.close()          
-
-
