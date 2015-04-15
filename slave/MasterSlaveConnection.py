@@ -17,7 +17,7 @@ logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,f
 logger = logging.getLogger('MasterSlaveConnection.py')
 keylocation = {}
 num_of_requests = 0
-threshold = 0
+threshold = 5
 
 class MasterSlaveConnection:
     ''' Class to setup listening port and receive requests
@@ -36,7 +36,7 @@ class MasterSlaveConnection:
                 name, endpoint = line.partition("=")[::2]
                 self.masters[name] = endpoint
 	
-        with open("config/monitors.txt") as myfile:
+        with open("config/monitor.txt") as myfile:
             for line in myfile:
                 name, endpoint = line.partition("=")[::2]
                 self.monitors[name] = endpoint
@@ -61,25 +61,29 @@ def getMonitor():
 
 def ServeRequest(request,masters,keylocation):
 	''' Process the request and return result '''
-
-
     	try:
-		masterNode,userid,action,data = request.split(" ")
+		#masterNode,userid,action,data = request.split(" ")
+		req = json.loads(request)
+		masterNode = req['Master']
+                userid = req['userid']
+                action = req['request']
+		data = req['data']
+		
 		#call apis here	
-		logger.debug('Processing '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data)
+		#logger.debug('Processing '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+str(data))
 		api=MugenDBAPI()
 		if action == "put":
-		    jsondata = {data.split(":")[0]:data.split(":")[1]}
-		    val = api.put(jsondata,keylocation,userid)
+		    #jsondata = {data.split(":")[0]:data.split(":")[1]}
+		    val = api.put(data,keylocation,userid)
 		elif action == "get":
 		    val=api.get(data,keylocation,userid)
 		elif action == "update":
-		    jsondata = {data.split(":")[0]:data.split(":")[1]}
+		    #jsondata = {data.split(":")[0]:data.split(":")[1]}
 		    val=api.update(data,keylocation,userid)
 		elif action == "delete":
 		    val=api.delete(data,keylocation,userid)
 	
-		logger.debug('Processed succesfully: '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+data+' ,return= '+str(val))
+		logger.debug('Processed succesfully: '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+str(data)+' ,return= '+str(val))
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		host,port = masters[masterNode].partition(":")[::2]
 		print host,port,val
