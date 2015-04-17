@@ -11,8 +11,10 @@ import json
 
 number_of_masters = 2
 masters = dict()
+clients = dict()
 threshold = {'Master1':'No','Master2':'No'}
 i = 0
+receivestatus_port = 10008
 
 def thresholdListen():
 	print 'Threshold daemon running'
@@ -27,10 +29,23 @@ def thresholdListen():
 		threshold[master]= val
 		print request
 
+def receiveStatus():
+	print 'Listening for status on port ' + str(receivestatus_port)
+	portNumber = receivestatus_port
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
+	host = socket.gethostname()               
+	sock.bind((host, portNumber))
+	while True:
+   		status, addr = sock.recvfrom(1024)
+		returnobj=json.loads(status)
+		print returnobj['userid'] +"---"+returnobj['result']
+		clients[returnobj['userid']].send(returnobj['result']) 
+
+
 class Server:
 	def __init__(self): 
 		self.host = ''
-        	self.port = 13465
+        	self.port = 13464
         	self.backlog = 5
         	self.size = 1024
         	self.server = None
@@ -56,6 +71,10 @@ class Server:
 		#start a daemon thread to listen threshold
 		thread = Thread(target = thresholdListen, args = ())
 		thread.start()
+	
+		#start a thread to listen results of req from masters
+		resultThread = Thread(target = receiveStatus, args = ())
+		resultThread.start()
 	
 		while running: 
 	   		inputready,outputready,exceptready = select.select(input,[],[])                
@@ -91,12 +110,12 @@ def run(client,address):
 		attempts = attempts + 1
 	        data = json.loads(client.recv(size))
             	if data:
+		    clients[data['username']]=client
 		    conn_2 = sqlite3.connect('authentication_info.db')
 	   	    c_2 = conn_2.cursor()
 	   	    password = ""
 	   	    for row in c_2.execute("SELECT password from user_info where username = '%s'" % data['username']):
 	   		password = row
-	   	    conn_2.commit()
 	   	    conn_2.close()
 	   	    if not password:
 			client.send('Login failed')
@@ -119,7 +138,7 @@ def run(client,address):
 	    print host,port
 	    sock.sendto(json.dumps(request_key_value_pair), (host,int(port)))
 	    sock.close()
-	    client.send("successfully received input data and request")
+	    #client.send("successfully received input data and request")
 
 
 if __name__ == "__main__":
@@ -127,7 +146,7 @@ if __name__ == "__main__":
 	conn = sqlite3.connect('authentication_info.db')
 	c = conn.cursor()
 	#c.execute('''DROP TABLE user_info''')
-	c.execute("CREATE TABLE user_info (username text, password text)")
+	#c.execute("CREATE TABLE user_info (username text, password text)")
 	c.execute("INSERT INTO user_info values('shashank','goud')")
 	c.execute("INSERT INTO user_info values('ankit','bhandari')")
 	c.execute("INSERT INTO user_info values('kaustubh','sant')")
