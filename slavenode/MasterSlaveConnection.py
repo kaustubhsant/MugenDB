@@ -61,33 +61,34 @@ def getMonitor():
 
 def ServeRequest(request,masters,keylocation):
 	''' Process the request and return result '''
+
+
     	try:
-		#masterNode,userid,action,data = request.split(" ")
 		req = json.loads(request)
+		requestid = req['id']
 		masterNode = req['Master']
                 userid = req['userid']
                 action = req['request']
 		data = req['data']
 		
 		#call apis here	
-		#logger.debug('Processing '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+str(data))
+		logger.debug('Processing {0} request from master {1},userid= {2},data={3}'.format(requestid,masterNode,userid,data))
 		api=MugenDBAPI()
 		if action == "put":
-		    #jsondata = {data.split(":")[0]:data.split(":")[1]}
 		    val = api.put(data,keylocation,userid)
 		elif action == "get":
 		    val=api.get(data,keylocation,userid)
 		elif action == "update":
-		    #jsondata = {data.split(":")[0]:data.split(":")[1]}
 		    val=api.update(data,keylocation,userid)
 		elif action == "delete":
 		    val=api.delete(data,keylocation,userid)
 	
-		logger.debug('Processed succesfully: '+action+' request from master '+masterNode+' ,userid='+userid+' ,data='+str(data)+' ,return= '+str(val))
+		logger.debug('Processing {0} request from master {1},userid= {2},data={3},return='.format(requestid,masterNode,userid,data,val))
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		host,port = masters[masterNode].partition(":")[::2]
 		print host,port,val
 		res = dict()
+		res['id'] = requestid
 		res['userid'] =  userid
 		res['result'] =  val
 		sock.sendto(json.dumps(res), (host,int(port)))
@@ -106,7 +107,7 @@ def loadkeymap():
 		with open("KeyMap.txt",'r') as keyfin:
 			for line in keyfin:
 				keylocation[line.strip().split(":")[0]] = line.strip().split(":")[1]
-	#print keylocation
+
 
 if __name__ == "__main__":    
 	loadkeymap()
