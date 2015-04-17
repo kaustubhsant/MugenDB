@@ -11,6 +11,10 @@ from hash_ring import HashRing
 import traceback
 
 masternum = 1
+#intialize logging
+log_filename = 'logs/'+'slave-log.txt'
+logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('MasterMonitorConnection.py')
 
 class MasterMonitorConnection:
     def __init__(self,portNumber):
@@ -48,13 +52,16 @@ class MasterMonitorConnection:
 	while True:
 			  try:
 			   	  request, addr = self.sock.recvfrom(1024)
-				  print request
+				  print request				  
+
 			    	  #self.pool.apply_async(ServeRequest, args=(request,self.monitor,keylocation))
 				  rec_req = json.loads(request)
-		
-				  if rec_req['data'].keys():
+				  rec_req['id'] = 1
+				  logger.debug('Processing {0} request from userid= {2},data={3}'.format(req_rec['id'],req_rec['userid'],req_rec['data']))		
+				  try:
+					#rec_req['data'].keys():
 					key = rec_req['data'].keys()[0]
-				  else:
+				  except:
 					key = rec_req['data']
 				  print rec_req
 				  hxmd5 = self.calculatemd5(key)		  
@@ -73,6 +80,7 @@ class MasterMonitorConnection:
 			  sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		    	  print host,port
 		    	  sock.sendto(json.dumps(rec_req), (host,int(port)))
+		          logger.debug('Processed {0} request, sent to {1}'.format(req_req['id'],slave_node))
 		    	  sock.close()
 		  
 	
