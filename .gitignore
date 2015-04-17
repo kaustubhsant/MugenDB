@@ -1,5 +1,5 @@
-.pyc
+*.pyc
 .pydevproject
 .project
-.db
-.txt
+*.db
+*.txt
