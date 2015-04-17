@@ -87,7 +87,10 @@ def ServeRequest(request,masters,keylocation):
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		host,port = masters[masterNode].partition(":")[::2]
 		print host,port,val
-		sock.sendto(str(val), (host,int(port)))
+		res = dict()
+		res['userid'] =  userid
+		res['result'] =  val
+		sock.sendto(json.dumps(res), (host,int(port)))
 		sock.close()
                 global num_of_requests
                 num_of_requests=num_of_requests-1
