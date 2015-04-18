@@ -1,2 +1,2 @@
-Slave1=localhost:12345
-Slave2=localhost:12345
+Slave1=152.46.20.195:12345
+Slave2=152.46.20.139:12345
