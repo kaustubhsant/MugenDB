@@ -30,10 +30,11 @@ class SlaveListener:
     def listen(self):
 	print 'listening....' #TODO : log this
 	while True:
-   	    request, addr = json.loads(self.sock.recvfrom(1024))
+   	    req, addr = self.sock.recvfrom(1024)
+	    request = json.loads(req)
 	    logger.debug('Recieved request id {} with result {}'.format(request['id'],request['result']))
 	    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	    host,port = monitors.keys()[0].partition(":")[::2]
+	    host,port = self.monitors[self.monitors.keys()[0]].split(":")
 	    print host,port,str(request)
 	    sock.sendto(json.dumps(request), (host,int(port)))
 	    sock.close()

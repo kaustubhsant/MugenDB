@@ -57,7 +57,7 @@ class MasterMonitorConnection:
 			    	  #self.pool.apply_async(ServeRequest, args=(request,self.monitor,keylocation))
 				  rec_req = json.loads(request)
 				  rec_req['id'] = 1
-				  logger.debug('Processing {0} request from userid= {2},data={3}'.format(req_rec['id'],req_rec['userid'],req_rec['data']))		
+				  logger.debug('Processing {0} request from userid= {1},data={2}'.format(rec_req['id'],rec_req['userid'],rec_req['data']))		
 				  try:
 					#rec_req['data'].keys():
 					key = rec_req['data'].keys()[0]
@@ -80,7 +80,7 @@ class MasterMonitorConnection:
 			  sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		    	  print host,port
 		    	  sock.sendto(json.dumps(rec_req), (host,int(port)))
-		          logger.debug('Processed {0} request, sent to {1}'.format(req_req['id'],slave_node))
+		          logger.debug('Processed {0} request, sent to {1}'.format(rec_req['id'],slave_node))
 		    	  sock.close()
 		  
 	
