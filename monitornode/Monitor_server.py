@@ -105,8 +105,9 @@ def run(client,address):
         size = 1024
         running = 1
 	attempts = 0
+	flag = 0
         while running:
-	    while(attempts < 3):
+	    while(attempts < 3 and flag == 0):
 		attempts = attempts + 1
 	        data = json.loads(client.recv(size))
             	if data:
@@ -124,12 +125,14 @@ def run(client,address):
 		    else:
 	   		print 'Login Successful\n'
 	   		client.send('Thank you for connecting')
+			flag = 1
 			break
 	    request_key_value_pair = json.loads(client.recv(size))
 	    if (request_key_value_pair['request']=="Logout"):
 		print "closing connection"
 		client.close()
 	        running = 0 
+		flag = 0
 	    print 'Request is ' + str(request_key_value_pair)
 	    master_node = getMaster()
 	    print master_node+'is serving the request'

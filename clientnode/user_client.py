@@ -3,6 +3,7 @@ import socket
 import json
 
 def request_input(request):
+	global input_to_monitor
 	if str(request) =="put" :
 		userinput = {}
 		data = raw_input("Enter data as key:value\n")
