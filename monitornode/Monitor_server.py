@@ -38,8 +38,8 @@ def receiveStatus():
 	while True:
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
-		print returnobj['userid'] +"---"+returnobj['result']
-		clients[returnobj['userid']].send(returnobj['result']) 
+		print returnobj['userid'] +"---"+str(returnobj['result'])
+		clients[returnobj['userid']].send('Hi '+str(returnobj['result'])) 
 
 
 class Server:
