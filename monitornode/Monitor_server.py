@@ -39,7 +39,7 @@ def receiveStatus():
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
 		print returnobj['userid'] +"---"+str(returnobj['result'])
-		clients[returnobj['userid']].send('Hi '+str(returnobj['result'])) 
+		clients[returnobj['userid']].send(str(returnobj['result'])) 
 
 
 class Server:
@@ -146,7 +146,7 @@ if __name__ == "__main__":
 	conn = sqlite3.connect('authentication_info.db')
 	c = conn.cursor()
 	#c.execute('''DROP TABLE user_info''')
-	#c.execute("CREATE TABLE user_info (username text, password text)")
+	c.execute("CREATE TABLE user_info (username text, password text)")
 	c.execute("INSERT INTO user_info values('shashank','goud')")
 	c.execute("INSERT INTO user_info values('ankit','bhandari')")
 	c.execute("INSERT INTO user_info values('kaustubh','sant')")

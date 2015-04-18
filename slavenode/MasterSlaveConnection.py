@@ -83,7 +83,7 @@ def ServeRequest(request,masters,keylocation):
 		elif action == "delete":
 		    val=api.delete(data,keylocation,userid)
 	
-		logger.debug('Processing {0} request from master {1},userid= {2},data={3},return='.format(requestid,masterNode,userid,data,val))
+		logger.debug('Processing {0} request from master {1},userid= {2},data={3},return={4}'.format(requestid,masterNode,userid,data,val))
 		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		host,port = masters[masterNode].partition(":")[::2]
 		print host,port,val
