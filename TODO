@@ -1,3 +1,2 @@
-1. Chain replication of slave node
-2. Adding or deleting slave(redistribute keys) or master node
-3. Peformance testing
+1. Adding or deleting slave(redistribute keys) or master node
+2. Peformance testing
