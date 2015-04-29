@@ -91,6 +91,7 @@ def ServeRequest(request,masters,keylocation):
 		res['id'] = requestid
 		res['userid'] =  userid
 		res['result'] =  val
+		res['request'] = action
 		sock.sendto(json.dumps(res), (host,int(port)))
 		sock.close()
                 global num_of_requests

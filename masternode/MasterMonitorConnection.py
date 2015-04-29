@@ -30,14 +30,17 @@ class MasterMonitorConnection:
 		print endpoint
                 self.monitors[name] = endpoint
         self.pool = ThreadPool(10) #TODO : configure this
-
-    def find_slave_node(self,hxmd5):
-	memcache_servers = []
+	self.memcache_servers = []
+	self.slave_nodes = dict()
 	with open("config/slave.txt",'r') as myfile:
 		for line in myfile:
 			name, endpoint = line.partition("=")[::2]
-			memcache_servers.append(endpoint)		
-	ring = HashRing(memcache_servers)
+			self.memcache_servers.append(endpoint)
+			self.slave_nodes[name]=endpoint
+
+    def find_slave_node(self,hxmd5):
+			
+	ring = HashRing(self.memcache_servers)
 	server = ring.get_node(hxmd5)
 	return server
 
@@ -82,7 +85,29 @@ class MasterMonitorConnection:
 		    	  sock.sendto(json.dumps(rec_req), (host,int(port)))
 		          logger.debug('Processed {0} request, sent to {1}'.format(rec_req['id'],slave_node))
 		    	  sock.close()
-		  
+			  if rec_req['request'] == 'get':
+			  	self.send_to_neighbours(slave_node,rec_req)
+
+    def send_to_neighbours(self,slave_node,rec_req):
+		for name,endpoint in self.slave_nodes.items():
+			if endpoint == slave_node:
+				slave = name
+		slave_num=int(slave[5:])
+		count = len(self.memcache_servers)
+		#send it to two neighbours
+		slave2 = ((slave_num%count)+1)
+		slave3 = ((slave_num%count)+2)
+                if slave2 > count:
+			slave2 = slave2%count
+		if slave3 > count:
+			slave3 = slave3%count
+		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		host,port = self.slave_nodes['Slave'+str(slave2)].partition(":")[::2]
+		sock.sendto(json.dumps(rec_req), (host,int(port)))
+		host,port = self.slave_nodes['Slave'+str(slave3)].partition(":")[::2]
+		sock.sendto(json.dumps(rec_req), (host,int(port)))
+		sock.close()
+		
 	
 if __name__ == "__main__":    
 	s=MasterMonitorConnection(10003)
