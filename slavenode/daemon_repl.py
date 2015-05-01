@@ -34,7 +34,7 @@ class Backup_Data:
 	
 	def repl(self,passwd,node):
 		logger.debug("replicating on {}".format(node))
-		os.system("sshpass -p '{0}' scp Backup_MugenDBfile.patch backup@{1}:/home/backup".format(passwd,node))
+		os.system("sshpass -p '{0}' scp Backup_MugenDBfile.patch backup_slave@{1}:/home/backup".format(passwd,node))
 		logger.debug("replicated on {}".format(node))
 		
 
