@@ -37,11 +37,10 @@ class MasterMonitorConnection:
 			name, endpoint = line.partition("=")[::2]
 			self.memcache_servers.append(endpoint)
 			self.slave_nodes[name]=endpoint
+	self.ring = HashRing(self.memcache_servers)
 
     def find_slave_node(self,hxmd5):
-			
-	ring = HashRing(self.memcache_servers)
-	server = ring.get_node(hxmd5)
+	server = self.ring.get_node(hxmd5)
 	return server
 
     def calculatemd5(self,key):
