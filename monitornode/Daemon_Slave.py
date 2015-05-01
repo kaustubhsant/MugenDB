@@ -14,12 +14,14 @@ class DaemonSlave:
 		self.sock.bind((self.host, self.portNumber))
 
 	def listen(self):
-		print 'listening....' #TODO : log this
+		print 'listening....'
+		#listen for heartbeat from slaves
 		while True:
    	  		request, addr = self.sock.recvfrom(1024)
 			nodes[request]=datetime.datetime.now()
 			print request
 
+	#this method is used restart dead slave nodes from which we didnt hear any heartbeat for preconfigured time.
 	def run(self):
 		thread = Thread(target = self.listen, args = ())
 		thread.start()
@@ -28,7 +30,8 @@ class DaemonSlave:
 			dead = self.get_dead_nodes()
 			print 'printing dead...'
 			print str(dead)
-		
+
+	# return an array of dead slave nodes. If we don receive an heart beat for 'time_for_dead' seconds, we assume that slave is dead.
 	def get_dead_nodes(self):
 		silent = [slave for (slave, hbtime) in nodes.items() if (datetime.datetime.now()-hbtime).seconds > time_for_dead]
 		return silent
