@@ -1,3 +1,4 @@
+import sys
 import socket
 import threading
 import thread
@@ -110,7 +111,11 @@ def loadkeymap():
 				keylocation[line.strip().split(":")[0]] = line.strip().split(":")[1]
 
 
-if __name__ == "__main__":    
+def main(args):
+	port = int(args[1])
 	loadkeymap()
-	s=MasterSlaveConnection(12345)
+	s=MasterSlaveConnection(port)
 	s.listen()
+
+if __name__ == "__main__":    
+	main(sys.argv)
