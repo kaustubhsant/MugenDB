@@ -22,12 +22,11 @@ def thresholdListen():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
 	host = socket.gethostname()               
 	sock.bind((host, portNumber))
-	print 'listening threshold....' #TODO : log this
+	#listen for threshold from the masters and update threshold dictionary.this will be used will redirecting requests to master.
 	while True:
    		request, addr = sock.recvfrom(1024)
 		master,val = request.split(" ")
 		threshold[master]= val
-		print request
 
 def receiveStatus():
 	print 'Listening for status on port ' + str(receivestatus_port)
@@ -35,10 +34,10 @@ def receiveStatus():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
 	host = socket.gethostname()               
 	sock.bind((host, portNumber))
+	#get the status for processed request from master and send it back to client
 	while True:
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
-		print returnobj['userid'] +"---"+str(returnobj['result'])
 		clients[returnobj['userid']].send(str(returnobj['result'])) 
 
 
@@ -82,6 +81,7 @@ class Server:
 				if s == self.server:
 					
 					client,address = self.server.accept()
+					#Assign one thread to handle each client.
 		                        self.pool.apply_async(run, args=(client,address))
 				else:
 					junk = sys.stdin.readline()
@@ -89,6 +89,8 @@ class Server:
 
 		self.server.close()
 
+#This method will return the next master to which the request should be redirected.
+#Round robin scheduling is used here.
 def getMaster():
 	global i
 	i=((i)%(number_of_masters))+1
@@ -99,7 +101,7 @@ def getMaster():
 			break
 	return 'Master'+str(i)
 
-
+#This method will be run in seperate thread to process client requests.
 def run(client,address):
 	
         size = 1024
