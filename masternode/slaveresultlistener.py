@@ -26,6 +26,7 @@ class SlaveListener:
 	self.sock.bind((self.host, self.portNumber)) 
 	self.monitors = dict()	
 	self.results = dict()
+	#req_times is used to push the results of get req when there is a delay in fetching them from multiple nodes.
 	self.req_times = dict()
 	
         with open("config/monitor.txt") as myfile:
@@ -48,9 +49,10 @@ class SlaveListener:
 		    sock.sendto(json.dumps(request), (host,int(port)))
 		    sock.close()
 	    else:
-		    #noting the times at which listner got initial get req
+		    #take note of the time at which listner got initial get req
                     if request['id'] not in self.req_times: 
 			    self.req_times[request['id']]=datetime.datetime.now()
+		    #append the returned results of get req. Based on the majority we would be chosing a winner.
 		    if request['id'] in self.results:
 		    	    self.results[request['id']].append(request)
 		    else:
@@ -63,10 +65,12 @@ class SlaveListener:
 			    host,port = self.monitors[self.monitors.keys()[0]].split(":")
 			    sock.sendto(json.dumps(majority_result), (host,int(port)))
 			    sock.close()
+			    #delete the items related to this req.
 			    del self.results[request['id']]
 			    del self.req_times[request['id']]
 	    logger.debug('sent request id {} with result {} to monitor'.format(request['id'],request['result']))
     
+    #return the result which is a majority among the given list
     def get_majority(self,json_list):
 	 temp_dict = {}
          for res in json_list:
@@ -81,8 +85,8 @@ class SlaveListener:
          majority_result = [obj for (res1,obj) in temp_dict.items() if len(obj) >= 2]
          return majority_result[0][0]
   
+    #this method is to push the updates of get requests which are being held back for more than 500 millisec
     def push_results(self):
-	 #this method is to push the updates of get requests which are being held back for more than 500 millisec
 	 while True:
 		 sleep(0.005) #sleep for 5 milli sec
 		 silent_reqs = [reqid for (reqid, hbtime) in self.req_times.items() if (datetime.datetime.now()-hbtime).seconds > 0.005]
@@ -92,8 +96,8 @@ class SlaveListener:
 			 logger.debug('Silent requests :'+str(silent_reqs))
 			 for reqid in silent_reqs:
 				 logger.debug('pushing results'+ str(reqid))
-				 #print self.results[int(reqid)][0]
 				 sock.sendto(json.dumps(self.results[int(reqid)][0]), (host,int(port)))
+				 #delete the items related to this req.
                                  del self.req_times[reqid]
 				 del self.results[int(reqid)]
 			 sock.close()		

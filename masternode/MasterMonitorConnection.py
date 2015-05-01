@@ -39,24 +39,22 @@ class MasterMonitorConnection:
 			self.slave_nodes[name]=endpoint
 	self.ring = HashRing(self.memcache_servers)
 
+    #fetch the slave node to which this req should be redirected
     def find_slave_node(self,hxmd5):
 	server = self.ring.get_node(hxmd5)
 	return server
 
+    #calculate md5 hash for the given key
     def calculatemd5(self,key):
 	m = hashlib.md5()
 	m.update(key)
 	return m.digest()
 
     def listen(self):
-	print 'listening....' #TODO : log this
-	#self.pool.apply_async(savekeymap,args=(self.keylocation,))
+	print 'listening....' 
 	while True:
 			  try:
-			   	  request, addr = self.sock.recvfrom(1024)
-				  print request				  
-
-			    	  #self.pool.apply_async(ServeRequest, args=(request,self.monitor,keylocation))
+			   	  request, addr = self.sock.recvfrom(1024)			  
 				  rec_req = json.loads(request)
 				  rec_req['id'] = 1
 				  logger.debug('Processing {0} request from userid= {1},data={2}'.format(rec_req['id'],rec_req['userid'],rec_req['data']))		
@@ -71,13 +69,12 @@ class MasterMonitorConnection:
 				  print slave_node
 				  #rec_req['md5'] = "".join(ord(x) for x in hxmd5)
                                   rec_req['md5'] = "hello"
-				  print rec_req['md5']
 				  rec_req['Master'] = 'Master'+str(masternum)
 				  print rec_req
 			  except:
 				print (traceback.format_exc())
-			#self.server.close()
-			#connect to slave and send rec_req
+			  
+                          #fetch slave node host and port
 			  host,port = slave_node.partition(":")[::2]
 			  sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		    	  print host,port
@@ -87,6 +84,7 @@ class MasterMonitorConnection:
 			  if rec_req['request'] == 'get':
 			  	self.send_to_neighbours(slave_node,rec_req)
 
+    #If request is get then we need to fetch the result from 2 neighbouring nodes of the selected slave node.
     def send_to_neighbours(self,slave_node,rec_req):
 		for name,endpoint in self.slave_nodes.items():
 			if endpoint == slave_node:
