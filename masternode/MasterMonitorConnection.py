@@ -17,6 +17,7 @@ logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,f
 logger = logging.getLogger('MasterMonitorConnection.py')
 
 class MasterMonitorConnection:
+    ''' Receive the requests from monitor node and redirect them to slave nodes using consistent hashing'''
     def __init__(self,portNumber):
         self.portNumber = portNumber
 	self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
@@ -39,18 +40,19 @@ class MasterMonitorConnection:
 			self.slave_nodes[name]=endpoint
 	self.ring = HashRing(self.memcache_servers)
 
-    #fetch the slave node to which this req should be redirected
     def find_slave_node(self,hxmd5):
+	'''fetch the slave node to which this req should be redirected'''
 	server = self.ring.get_node(hxmd5)
 	return server
 
-    #calculate md5 hash for the given key
     def calculatemd5(self,key):
+	'''calculate md5 hash for the given key'''
 	m = hashlib.md5()
 	m.update(key)
 	return m.digest()
 
     def listen(self):
+	''' listen and redirect the requests to slaves '''
 	print 'listening....' 
 	while True:
 			  try:
@@ -84,8 +86,8 @@ class MasterMonitorConnection:
 			  if rec_req['request'] == 'get':
 			  	self.send_to_neighbours(slave_node,rec_req)
 
-    #If request is get then we need to fetch the result from 2 neighbouring nodes of the selected slave node.
     def send_to_neighbours(self,slave_node,rec_req):
+	'''If request is get then we need to fetch the result from 2 neighbouring nodes of the selected slave node.'''
 		for name,endpoint in self.slave_nodes.items():
 			if endpoint == slave_node:
 				slave = name

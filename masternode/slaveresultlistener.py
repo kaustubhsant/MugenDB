@@ -35,6 +35,7 @@ class SlaveListener:
                 self.monitors[name] = endpoint
 
     def listen(self):
+	'''listen for responses from slaves and redirect them back to monitor node'''
 	print('listening....') #TODO : log this
 	thread = Thread(target = self.push_results, args = ())
 	thread.start()
@@ -70,8 +71,8 @@ class SlaveListener:
 			    del self.req_times[request['id']]
 	    logger.debug('sent request id {} with result {} to monitor'.format(request['id'],request['result']))
     
-    #return the result which is a majority among the given list
     def get_majority(self,json_list):
+	'''return the result which is a majority among the given list'''
 	 temp_dict = {}
          for res in json_list:
                 if res['result']!=-1:
@@ -85,8 +86,8 @@ class SlaveListener:
          majority_result = [obj for (res1,obj) in temp_dict.items() if len(obj) >= 2]
          return majority_result[0][0]
   
-    #this method is to push the updates of get requests which are being held back for more than 500 millisec
     def push_results(self):
+	'''this method is to push the updates of get requests which are being held back for more than 500 millisec'''
 	 while True:
 		 sleep(0.005) #sleep for 5 milli sec
 		 silent_reqs = [reqid for (reqid, hbtime) in self.req_times.items() if (datetime.datetime.now()-hbtime).seconds > 0.005]
