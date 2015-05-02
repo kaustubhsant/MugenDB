@@ -17,24 +17,24 @@ i = 0
 receivestatus_port = 10008
 
 def thresholdListen():
+	'''listen for threshold from the masters and update threshold dictionary.this will be used will redirecting requests to master.'''
 	print 'Threshold daemon running'
 	portNumber = 10007
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
 	host = socket.gethostname()               
 	sock.bind((host, portNumber))
-	#listen for threshold from the masters and update threshold dictionary.this will be used will redirecting requests to master.
 	while True:
    		request, addr = sock.recvfrom(1024)
 		master,val = request.split(" ")
 		threshold[master]= val
 
 def receiveStatus():
+	'''get the status for processed request from master and send it back to client'''
 	print 'Listening for status on port ' + str(receivestatus_port)
 	portNumber = receivestatus_port
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
 	host = socket.gethostname()               
 	sock.bind((host, portNumber))
-	#get the status for processed request from master and send it back to client
 	while True:
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
@@ -42,6 +42,7 @@ def receiveStatus():
 
 
 class Server:
+	''' Accept requests from clients and redirect them to masters in round robin pattern'''
 	def __init__(self): 
 		self.host = ''
         	self.port = 13464
@@ -89,9 +90,9 @@ class Server:
 
 		self.server.close()
 
-#This method will return the next master to which the request should be redirected.
-#Round robin scheduling is used here.
+
 def getMaster():
+	'''This method will return the next master to which the request should be redirected.'''
 	global i
 	i=((i)%(number_of_masters))+1
 	while True:
@@ -101,9 +102,9 @@ def getMaster():
 			break
 	return 'Master'+str(i)
 
-#This method will be run in seperate thread to process client requests.
+
 def run(client,address):
-	
+	'''This method will be run in seperate thread to process client requests.'''
         size = 1024
         running = 1
 	attempts = 0
