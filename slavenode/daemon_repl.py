@@ -17,6 +17,9 @@ class Backup_Data:
 				self.replpass.append(line.strip().split("="))
 
 	def backup(self):		
+		''' Creates threads and does scp for data replication to  nodes'''
+
+
 		if(os.path.isfile(self.backupfile) == False):
 			f = file(self.backupfile,"w")
 		os.system("diff -u {0} {1} > {2}".format(self.backupfile,self.dbfile,self.backuppatch))

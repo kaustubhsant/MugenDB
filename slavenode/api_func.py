@@ -12,6 +12,9 @@ class MugenDBAPI:
 	self.keymaplock = Lock()
 
     def mark_key(self,infile,seekpoint):
+	''' Marks a key-value in database file as outdated'''
+
+
 	newline = ""
 	self.dblock.acquire()
     	with open(infile,'r+') as fwr:
@@ -24,6 +27,9 @@ class MugenDBAPI:
 	self.dblock.release()
     
     def deleteline(self,infile,key):
+	'''Deteles a line in file inplace'''
+
+
 	import fileinput
 	file = fileinput.input(infile, inplace=True)
 	for line in file:
@@ -31,6 +37,9 @@ class MugenDBAPI:
        		print line.strip()
 
     def put(self,data,keylocation,userid):
+	''' Stores the key-value pair in database file'''
+
+
         for key in data.keys():
             if key in keylocation:
                 print "Error: key '{0}' already exists".format(key)
@@ -52,6 +61,9 @@ class MugenDBAPI:
                 return 0
 
     def get(self,key,keylocation,userid):
+	''' Retrieves the key-value pair for given key'''
+
+
         if key in keylocation:
             '''
             For access control policy
@@ -67,6 +79,9 @@ class MugenDBAPI:
             return -1
 	        
     def update(self,data,keylocation,userid):
+	''' Updates the value of the given key'''
+
+
         for key in data.keys():
             if key in keylocation:
                 '''
@@ -94,6 +109,9 @@ class MugenDBAPI:
             	return -1
 
     def delete(self,key,keylocation,userid):
+	'''Deletes the given key from database'''
+
+
         if key in keylocation:
             '''
             For access control policy
