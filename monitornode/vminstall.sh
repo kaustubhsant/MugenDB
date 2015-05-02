@@ -1,0 +1,14 @@
+virt-install \
+--connect qemu:///system \
+--name ubuntu \
+--ram 256 \
+--disk pool=default,size=5,bus=virtio,sparse=false \
+--network network=default,model=virtio \
+--location http://hu.archive.ubuntu.com/dists/precise-updates/main/installer-amd64 \
+--initrd-inject=/var/lib/libvirt/images/preseed.cfg \
+--extra-args="locale=en_GB.UTF-8 console-setup/ask_detect=false keyboard-configuration/layoutcode=hu file=file:/preseed.cfg vga=788 quiet" \
+--os-type=linux \
+--os-variant=ubuntuprecise \
+--virt-type kvm \
+--video=vga \
+--noreboot
