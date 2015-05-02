@@ -3,6 +3,7 @@ import socket
 import json
 
 def request_input(request):
+	''' Accept the new request from input stream '''
 	global input_to_monitor
 	if str(request) =="put" :
 		userinput = {}
@@ -43,6 +44,7 @@ port = 13464
 s.connect((host, port))
 s.send(json.dumps(user_details))
 
+#Send client details to authenticate user
 while(attempts < 3):
 	if s.recv(1024) == "Login failed" :
 	    attempts = attempts + 1
@@ -59,6 +61,7 @@ while(attempts < 3):
 request = raw_input('Enter your request:')
 
 result = request_input(request)
+#Send the request to monitor and display the response to user
 while(1):
 	if result == -1:
 		input_to_monitor['request'] = request
