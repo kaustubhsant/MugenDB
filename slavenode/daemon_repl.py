@@ -1,6 +1,7 @@
 import os
 import threading
 import logging
+import time
 
 log_filename = 'logs/'+'repl.log'
 logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -40,11 +41,24 @@ class Backup_Data:
 		logger.debug("replicating on {0}@{1}".format(repl[0],repl[1]))
 		os.system("cp Backup_MugenDBfile.patch Backup_MugenDBfile_{}.patch".format(repl[0]))
 		os.system("sshpass -p '{0}' scp Backup_MugenDBfile_{1}.patch backup_slave@{2}:/home/backup_slave/backup".format(repl[2],repl[0],repl[1]))
-		os.system("rm Backup_MugenDBfile_{}.patch".format(repl[0]))
 		logger.debug("replicated on {0}@{1}".format(repl[0],repl[1]))
-		
+		os.system("rm Backup_MugenDBfile_{}.patch".format(repl[0]))
 
+	def repl_neighbor(self):
+		filename = "/home/backup_slave/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[3][0])
+		print filename
+		if(os.path.isfile(filename) == True):		
+			if(os.path.isfile("MugenDBfile_{0}.txt".format(self.replpass[3][0])) == False):
+				f = file("MugenDBfile_{0}.txt".format(self.replpass[3][0]),"w")
+			logger.debug("patching file on {0}@{1}".format(self.replpass[3][0],self.replpass[3][1]))
+			os.system("patch MugenDBfile_{0}.txt {1}".format(self.replpass[3][0],filename))
+			logger.debug("patched file on {0}@{1}".format(self.replpass[3][0],self.replpass[3][1]))			
+			os.system("rm {}".format(filename))	
+
+	
 if __name__ == "__main__":
 	bkp = Backup_Data()
-	bkp.backup()
-	print "taking backup is completed"
+	while(1):
+		bkp.backup()
+		bkp.repl_neighbor()
+		time.sleep(1)	
