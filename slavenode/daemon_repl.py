@@ -24,7 +24,6 @@ class Backup_Data:
 		if(os.path.isfile(self.backupfile) == False):
 			f = file(self.backupfile,"w")
 		os.system("diff -u {0} {1} > {2}".format(self.backupfile,self.dbfile,self.backuppatch))
-		os.system("patch {0} {1}".format(self.backupfile,self.backuppatch))
 		t1 = threading.Thread(target=self.repl,args=(self.replpass[0],))
 		t2 = threading.Thread(target=self.repl,args=(self.replpass[1],))
 		t3 = threading.Thread(target=self.repl,args=(self.replpass[2],))
@@ -34,18 +33,19 @@ class Backup_Data:
 		t1.join()
 		t2.join()
 		t3.join()
+                os.system("patch {0} {1}".format(self.backupfile,self.backuppatch))
 		os.system("rm {}".format(self.backuppatch))
 		return 0
 	
 	def repl(self,repl):
 		logger.debug("replicating on {0}@{1}".format(repl[0],repl[1]))
 		os.system("cp Backup_MugenDBfile.patch Backup_MugenDBfile_{}.patch".format(repl[0]))
-		os.system("sshpass -p '{0}' scp Backup_MugenDBfile_{1}.patch backup_slave@{2}:/home/backup_slave/backup".format(repl[2],repl[0],repl[1]))
+		os.system("sshpass -p '{0}' scp Backup_MugenDBfile_{1}.patch spulima@{2}:/home/spulima/backup".format(repl[2],repl[0],repl[1]))
 		logger.debug("replicated on {0}@{1}".format(repl[0],repl[1]))
 		os.system("rm Backup_MugenDBfile_{}.patch".format(repl[0]))
 
 	def repl_neighbor(self):
-		filename = "/home/backup_slave/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[3][0])
+		filename = "/home/spulima/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[3][0])
 		print filename
 		if(os.path.isfile(filename) == True):		
 			if(os.path.isfile("MugenDBfile_{0}.txt".format(self.replpass[3][0])) == False):
