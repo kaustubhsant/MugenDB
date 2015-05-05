@@ -1,0 +1,9 @@
+2015-05-05 15:04:14,914 - daemon_repl.py - DEBUG - replicating on 152.46.17.96
+2015-05-05 15:04:14,914 - daemon_repl.py - DEBUG - replicating on 152.46.20.139
+2015-05-05 15:04:14,914 - daemon_repl.py - DEBUG - replicating on 152.46.17.28
+2015-05-05 15:05:17,733 - daemon_repl.py - DEBUG - replicating on repl1@152.46.17.96
+2015-05-05 15:05:17,733 - daemon_repl.py - DEBUG - replicating on Slave2@152.46.20.139
+2015-05-05 15:05:17,733 - daemon_repl.py - DEBUG - replicating on Slave3@152.46.17.28
+2015-05-05 15:05:17,858 - daemon_repl.py - DEBUG - replicated on repl1@152.46.17.96
+2015-05-05 15:05:17,874 - daemon_repl.py - DEBUG - replicated on Slave2@152.46.20.139
+2015-05-05 15:05:17,888 - daemon_repl.py - DEBUG - replicated on Slave3@152.46.17.28
