@@ -55,7 +55,6 @@ class Backup_Data:
 
 	def repl_neighbor(self):
 		filename = "/home/spulima/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[3][0])
-		print filename
 		if(os.path.isfile(filename) == True):		
 			if(os.path.isfile("MugenDBfile_{0}.txt".format(self.replpass[3][0])) == False):
 				f = file("MugenDBfile_{0}.txt".format(self.replpass[3][0]),"w")
@@ -63,6 +62,16 @@ class Backup_Data:
 			os.system("patch MugenDBfile_{0}.txt {1}".format(self.replpass[3][0],filename))
 			logger.debug("patched file on {0}@{1}".format(self.replpass[3][0],self.replpass[3][1]))			
 			os.system("rm {}".format(filename))	
+
+		filename = "/home/spulima/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[4][0])
+		if(os.path.isfile(filename) == True):		
+			if(os.path.isfile("MugenDBfile_{0}.txt".format(self.replpass[4][0])) == False):
+				f = file("MugenDBfile_{0}.txt".format(self.replpass[4][0]),"w")
+			logger.debug("patching file on {0}@{1}".format(self.replpass[4][0],self.replpass[4][1]))
+			os.system("patch MugenDBfile_{0}.txt {1}".format(self.replpass[4][0],filename))
+			logger.debug("patched file on {0}@{1}".format(self.replpass[4][0],self.replpass[4][1]))			
+			os.system("rm {}".format(filename))	
+
 
 	
 if __name__ == "__main__":
