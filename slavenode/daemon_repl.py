@@ -9,6 +9,7 @@ logger = logging.getLogger('daemon_repl.py')
 
 class Backup_Data:
 	def __init__(self):
+		self.slavenum = "Slave1"
 		self.dbfile = "MugenDBfile.txt"
 		self.backupfile = "Backup_MugenDBfile.txt"
 		self.backuppatch = "Backup_MugenDBfile.patch"
@@ -47,11 +48,11 @@ class Backup_Data:
 		return 0
 	
 	def repl(self,repl):
-		logger.debug("replicating on {0}@{1}".format(repl[0],repl[1]))
-		os.system("cp Backup_MugenDBfile.patch Backup_MugenDBfile_{}.patch".format(repl[0]))
-		os.system("sshpass -p '{0}' scp Backup_MugenDBfile_{1}.patch spulima@{2}:/home/spulima/backup".format(repl[2],repl[0],repl[1]))
-		logger.debug("replicated on {0}@{1}".format(repl[0],repl[1]))
-		os.system("rm Backup_MugenDBfile_{}.patch".format(repl[0]))
+		logger.debug("replicating on {0}@{1}".format(self.slavenum,repl[1]))
+		os.system("cp Backup_MugenDBfile.patch Backup_MugenDBfile_{}.patch".format(self.slavenum))
+		os.system("sshpass -p '{0}' scp Backup_MugenDBfile_{1}.patch spulima@{2}:/home/spulima/backup".format(repl[2],self.slavenum,repl[1]))
+		logger.debug("replicated on {0}@{1}".format(self.slavenum,repl[1]))
+		os.system("rm Backup_MugenDBfile_{}.patch".format(self.slavenum))
 
 	def repl_neighbor(self):
 		filename = "/home/spulima/backup/Backup_MugenDBfile_{0}.patch".format(self.replpass[3][0])

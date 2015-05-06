@@ -49,3 +49,15 @@
 2015-05-05 20:17:13,901 - daemon_repl.py - DEBUG - replicated on repl1@152.46.17.96
 2015-05-05 20:17:13,917 - daemon_repl.py - DEBUG - replicated on Slave2@152.46.20.139
 2015-05-05 20:17:13,931 - daemon_repl.py - DEBUG - replicated on Slave3@152.46.17.28
+2015-05-06 01:50:54,358 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.17.96
+2015-05-06 01:50:54,358 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.20.139
+2015-05-06 01:50:54,358 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.17.28
+2015-05-06 01:50:54,437 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.17.96
+2015-05-06 01:50:54,453 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.20.139
+2015-05-06 01:50:54,467 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.17.28
+2015-05-06 01:50:55,696 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.17.96
+2015-05-06 01:50:55,696 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.20.139
+2015-05-06 01:50:55,696 - daemon_repl.py - DEBUG - replicating on Slave1@152.46.17.28
+2015-05-06 01:50:55,773 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.17.96
+2015-05-06 01:50:55,789 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.20.139
+2015-05-06 01:50:55,805 - daemon_repl.py - DEBUG - replicated on Slave1@152.46.17.28
