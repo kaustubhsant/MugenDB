@@ -33,12 +33,16 @@ class MasterMonitorConnection:
         self.pool = ThreadPool(10) #TODO : configure this
 	self.memcache_servers = []
 	self.slave_nodes = dict()
+	self.backup = dict()
 	with open("config/slave.txt",'r') as myfile:
 		for line in myfile:
-			name, endpoint = line.partition("=")[::2]
-			self.memcache_servers.append(endpoint)
-			self.slave_nodes[name]=endpoint
+			name, endpoints = line.partition("=")[::2]
+			endpoint1,endpoint2= endpoints.split(',')
+			self.memcache_servers.append(endpoint1)
+			self.slave_nodes[name]=endpoint1
+			self.backup[name] =endpoint2
 	self.ring = HashRing(self.memcache_servers)
+	print self.backup
 
     def find_slave_node(self,hxmd5):
 	'''fetch the slave node to which this req should be redirected'''
@@ -88,24 +92,24 @@ class MasterMonitorConnection:
 
     def send_to_neighbours(self,slave_node,rec_req):
 	'''If request is get then we need to fetch the result from 2 neighbouring nodes of the selected slave node.'''
-		for name,endpoint in self.slave_nodes.items():
-			if endpoint == slave_node:
-				slave = name
-		slave_num=int(slave[5:])
-		count = len(self.memcache_servers)
-		#send it to two neighbours
-		slave2 = ((slave_num%count)+1)
-		slave3 = ((slave_num%count)+2)
-                if slave2 > count:
-			slave2 = slave2%count
-		if slave3 > count:
-			slave3 = slave3%count
-		sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		host,port = self.slave_nodes['Slave'+str(slave2)].partition(":")[::2]
-		sock.sendto(json.dumps(rec_req), (host,int(port)))
-		host,port = self.slave_nodes['Slave'+str(slave3)].partition(":")[::2]
-		sock.sendto(json.dumps(rec_req), (host,int(port)))
-		sock.close()
+	for name,endpoint in self.slave_nodes.items():
+		if endpoint == slave_node:
+			slave = name
+	slave_num=int(slave[5:])
+	count = len(self.memcache_servers)
+	#send it to two neighbours
+	slave2 = ((slave_num%count)+1)
+	slave3 = ((slave_num%count)+2)
+        if slave2 > count:
+		slave2 = slave2%count
+	if slave3 > count:
+		slave3 = slave3%count
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	host,port = self.backup['Slave'+str(slave2)].partition(":")[::2]
+	sock.sendto(json.dumps(rec_req), (host,int(port)))
+	host,port = self.backup['Slave'+str(slave3)].partition(":")[::2]
+	sock.sendto(json.dumps(rec_req), (host,int(port)))
+	sock.close()
 		
 	
 if __name__ == "__main__":    

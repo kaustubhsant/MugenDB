@@ -73,35 +73,35 @@ class SlaveListener:
     
     def get_majority(self,json_list):
 	'''return the result which is a majority among the given list'''
-	 temp_dict = {}
-         for res in json_list:
-                if res['result']!=-1:
-			key,val = (res['result'].items())[0]
-		else:
-			key,val = '-1','-1'
-	 	if val in temp_dict:
-			temp_dict[val].append(res)
-		else:
- 			temp_dict[val]=[res]
-         majority_result = [obj for (res1,obj) in temp_dict.items() if len(obj) >= 2]
-         return majority_result[0][0]
+	temp_dict = {}
+        for res in json_list:
+               if res['result']!=-1:
+	           key,val = (res['result'].items())[0]
+	       else:
+		   key,val = '-1','-1'
+	       if val in temp_dict:
+		   temp_dict[val].append(res)
+	       else:
+ 		   temp_dict[val]=[res]
+        majority_result = [obj for (res1,obj) in temp_dict.items() if len(obj) >= 2]
+        return majority_result[0][0]
   
     def push_results(self):
 	'''this method is to push the updates of get requests which are being held back for more than 500 millisec'''
-	 while True:
-		 sleep(0.005) #sleep for 5 milli sec
-		 silent_reqs = [reqid for (reqid, hbtime) in self.req_times.items() if (datetime.datetime.now()-hbtime).seconds > 0.005]
-		 if len(silent_reqs) > 0 :
-			 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-			 host,port = self.monitors[self.monitors.keys()[0]].split(":")
-			 logger.debug('Silent requests :'+str(silent_reqs))
-			 for reqid in silent_reqs:
-				 logger.debug('pushing results'+ str(reqid))
-				 sock.sendto(json.dumps(self.results[int(reqid)][0]), (host,int(port)))
-				 #delete the items related to this req.
-                                 del self.req_times[reqid]
-				 del self.results[int(reqid)]
-			 sock.close()		
+	while True:
+		sleep(0.005) #sleep for 5 milli sec
+		silent_reqs = [reqid for (reqid, hbtime) in self.req_times.items() if (datetime.datetime.now()-hbtime).seconds > 0.005]
+		if len(silent_reqs) > 0 :
+			sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			host,port = self.monitors[self.monitors.keys()[0]].split(":")
+			logger.debug('Silent requests :'+str(silent_reqs))
+			for reqid in silent_reqs:
+				logger.debug('pushing results'+ str(reqid))
+				sock.sendto(json.dumps(self.results[int(reqid)][0]), (host,int(port)))
+				#delete the items related to this req.
+                                del self.req_times[reqid]
+				del self.results[int(reqid)]
+			sock.close()		
 
 if __name__ == "__main__":    
 	s=SlaveListener(12600)
