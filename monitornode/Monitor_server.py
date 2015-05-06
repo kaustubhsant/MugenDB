@@ -28,6 +28,16 @@ def thresholdListen():
 		master,val = request.split(" ")
 		threshold[master]= val
 
+def informslaves(data):
+	req = {"request":"New","data":data}
+	with open("config/slave.txt",'r') as fin:
+		for line in fin:
+			host,port = line.strip().split("=")[1].split(",")[0].split(":")
+			sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			sock.sendto(json.dumps(data), (host,int(port)))
+			sock.close()
+		
+	
 def receiveStatus():
 	'''get the status for processed request from master and send it back to client'''
 	global masters
@@ -41,6 +51,17 @@ def receiveStatus():
 		returnobj=json.loads(status)
 		if returnobj['result'] == "shutdown":
 			masters = {k:v for k,v in masters.items if v.split(":")[0] != addr[0]}
+		elif returnobj['result'] == "New":
+			masters["Master{}".format(len(masters))] = "{}:{}".format(returnobj['host'],returnobj['port'])
+			data = "Master{}={}:{}".format(len(masters),returnobj['host'],returnobj['port'])
+			with open("config/masters.txt",'a') as myfile:
+				myfile.write("{}\n".format(data))
+			with open("config/slave.txt",'r') as fin:
+				slaves = ""
+				for line in fin:
+					slaves = slaves + line	
+				sock.sendto(slaves)
+			informslaves(data)
 		else:
 			clients[returnobj['userid']].send(str(returnobj['result'])) 
 

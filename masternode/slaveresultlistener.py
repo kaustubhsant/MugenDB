@@ -34,6 +34,7 @@ class SlaveListener:
                 name, endpoint = line.partition("=")[::2]
                 self.monitors[name] = endpoint
 
+
     def listen(self):
 	'''listen for responses from slaves and redirect them back to monitor node'''
 	print('listening....') #TODO : log this
