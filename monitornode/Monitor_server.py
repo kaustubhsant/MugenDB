@@ -30,6 +30,7 @@ def thresholdListen():
 
 def receiveStatus():
 	'''get the status for processed request from master and send it back to client'''
+	global masters
 	print 'Listening for status on port ' + str(receivestatus_port)
 	portNumber = receivestatus_port
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
@@ -38,7 +39,10 @@ def receiveStatus():
 	while True:
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
-		clients[returnobj['userid']].send(str(returnobj['result'])) 
+		if returnobj['result'] == "shutdown":
+			masters = {k:v for k,v in masters.items if v.split(":")[0] != addr[0]}
+		else:
+			clients[returnobj['userid']].send(str(returnobj['result'])) 
 
 
 class Server:
