@@ -34,6 +34,7 @@ class SlaveListener:
                 name, endpoint = line.partition("=")[::2]
                 self.monitors[name] = endpoint
 
+
     def listen(self):
 	'''listen for responses from slaves and redirect them back to monitor node'''
 	print('listening....') #TODO : log this
@@ -103,6 +104,17 @@ class SlaveListener:
 				del self.results[int(reqid)]
 			sock.close()		
 
+    def shutdown(self):
+	result = {"result":"shutdown"}
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	host,port = self.monitors[self.monitors.keys()[0]].split(":")
+	sock.sendto(json.dumps(result), (host,int(port)))
+	sock.close()
+
+
 if __name__ == "__main__":    
 	s=SlaveListener(12600)
-	s.listen()
+	try:
+		s.listen()
+	except KeyboardInterrupt:
+		s.shutdown()

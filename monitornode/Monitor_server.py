@@ -28,8 +28,19 @@ def thresholdListen():
 		master,val = request.split(" ")
 		threshold[master]= val
 
+def informslaves(data):
+	req = {"request":"New","data":data}
+	with open("config/slave.txt",'r') as fin:
+		for line in fin:
+			host,port = line.strip().split("=")[1].split(",")[0].split(":")
+			sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+			sock.sendto(json.dumps(data), (host,int(port)))
+			sock.close()
+		
+	
 def receiveStatus():
 	'''get the status for processed request from master and send it back to client'''
+	global masters
 	print 'Listening for status on port ' + str(receivestatus_port)
 	portNumber = receivestatus_port
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
@@ -38,7 +49,21 @@ def receiveStatus():
 	while True:
    		status, addr = sock.recvfrom(1024)
 		returnobj=json.loads(status)
-		clients[returnobj['userid']].send(str(returnobj['result'])) 
+		if returnobj['result'] == "shutdown":
+			masters = {k:v for k,v in masters.items if v.split(":")[0] != addr[0]}
+		elif returnobj['result'] == "New":
+			data = "Master{}={}:{}".format(len(masters),returnobj['host'],returnobj['port'])
+			with open("config/masters.txt",'a') as myfile:
+				myfile.write("{}\n".format(data))
+			with open("config/slave.txt",'r') as fin:
+				slaves = ""
+				for line in fin:
+					slaves = slaves + line	
+				sock.sendto(slaves)
+			informslaves(data)
+			masters["Master{}".format(len(masters))] = "{}:{}".format(returnobj['host'],returnobj['port'])
+		else:
+			clients[returnobj['userid']].send(str(returnobj['result'])) 
 
 
 class Server:

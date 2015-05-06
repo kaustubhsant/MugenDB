@@ -52,7 +52,13 @@ class MasterSlaveConnection:
 	thread.start()
 	while True:
    	    request, addr = self.sock.recvfrom(1024)
-    	    self.pool.apply_async(ServeRequest, args=(request,self.masters,keylocation))
+	    if req['request'] == "New":
+		with open("config/masters.txt",'a') as fin:
+			fin.write(req['data'])
+			fin.write("\n")
+		self.masters[data.split("=")[0]] = data.split("=")[1]
+	    else:
+	    	self.pool.apply_async(ServeRequest, args=(request,self.masters,keylocation))
 	    global num_of_requests
 	    num_of_requests=num_of_requests+1
 	    if num_of_requests > threshold:
