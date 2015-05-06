@@ -12,6 +12,9 @@ class Backup_Data:
 		self.dbfile = "MugenDBfile.txt"
 		self.backupfile = "Backup_MugenDBfile.txt"
 		self.backuppatch = "Backup_MugenDBfile.patch"
+		self.keymapfile = "KeyMap.txt"
+		self.keymapbackup = "Backup_KeyMap.txt"
+		self.keymappatch = "Backup_KeyMap.patch"
 		self.replpass = list()
 		with open("config/password.txt",'r') as fin:
 			for line in fin:
@@ -24,6 +27,12 @@ class Backup_Data:
 		if(os.path.isfile(self.backupfile) == False):
 			f = file(self.backupfile,"w")
 		os.system("diff -u {0} {1} > {2}".format(self.backupfile,self.dbfile,self.backuppatch))
+		if(os.path.isfile(self.keymapbackup) == False):
+			f = file(self.keymapbackup,"w")
+		os.system("diff -u {0} {1} > {2}".format(self.keymapbackup,self.keymapfile,self.keymappatch))
+		os.system("sshpass -p '{0}' scp {1} spulima@{2}:/home/spulima/backup".format(self.replpass[0][2],self.keymappatch,self.replpass[0][1]))
+                os.system("patch {0} {1}".format(self.keymapbackup,self.keymappatch))
+		os.system("rm {}".format(self.keymappatch))
 		t1 = threading.Thread(target=self.repl,args=(self.replpass[0],))
 		t2 = threading.Thread(target=self.repl,args=(self.replpass[1],))
 		t3 = threading.Thread(target=self.repl,args=(self.replpass[2],))
