@@ -20,6 +20,7 @@ keylocation1 = {}
 keylocation2 = {}
 num_of_requests = 0
 threshold = 5
+db_files = []
 
 class MasterSlaveConnection:
     ''' Class to setup listening port and receive requests
@@ -42,6 +43,7 @@ class MasterSlaveConnection:
             for line in myfile:
                 name, endpoint = line.partition("=")[::2]
                 self.monitors[name] = endpoint
+	getDbfiles()
         self.pool = ThreadPool(10) #TODO : configure this
 
     def listen(self):
@@ -57,6 +59,12 @@ class MasterSlaveConnection:
                mon.senddata('threshold')
                mon.closeconnection
 
+def getDbfiles():
+	db_files = []
+	with open("config/password.txt") as myfile:
+            for line in myfile:
+                db_files.append(line.strip().split("="))
+                
 def getMonitor():
 	return 'Monitor1'
 
@@ -74,11 +82,13 @@ def ServeRequest(request,masters,keylocation1,keylocation2):
 		
 		#call apis here	
 		logger.debug('Processing {0} request from master {1},userid= {2},data={3}'.format(requestid,masterNode,userid,data))
-		api=MugenDBAPI()
+		global db_files
+		api=MugenDBAPI(db_files[-2])
 		#the request will be for get only
 		val=api.get(data,keylocation1,userid)
 		if val == -1:
 			logger.debug('Searching for data in keymap2')
+			api=MugenDBAPI(db_files[-1])
 			val = api.get(data,keylocation2,userid)
 		
 		logger.debug('Processing {0} request from master {1},userid= {2},data={3},return={4}'.format(requestid,masterNode,userid,data,val))
@@ -112,7 +122,7 @@ def loadkeymap():
 
 
 def main(args):
-	port = int(args[1])
+	port = 10010
 	loadkeymap()
 	s=MasterSlaveConnection(port)
 	s.listen()
