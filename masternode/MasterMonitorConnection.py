@@ -9,12 +9,14 @@ import time
 import hashlib
 from hash_ring import HashRing
 import traceback
+from threading import Thread
 
 masternum = 1
 #intialize logging
 log_filename = 'logs/'+'slave-log.txt'
 logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('MasterMonitorConnection.py')
+backup_slave_nodes = {'Slave1':'152.46.17.96:10000','Slave2':'152.46.17.115:10001','Slave3':'152.1.13.84:10002','Slave4':'152.46.20.248:10003'}
 
 class MasterMonitorConnection:
     ''' Receive the requests from monitor node and redirect them to slave nodes using consistent hashing'''
@@ -68,6 +70,8 @@ class MasterMonitorConnection:
     def listen(self):
 	''' listen and redirect the requests to slaves '''
 	print 'listening....' 
+	thread = Thread(target = self.receive_slave_failure, args = ())
+	thread.start()
 	while True:
 			  try:
 			   	  request, addr = self.sock.recvfrom(1024)			  
@@ -120,7 +124,34 @@ class MasterMonitorConnection:
 	host,port = self.backup['Slave'+str(slave3)].partition(":")[::2]
 	sock.sendto(json.dumps(rec_req), (host,int(port)))
 	sock.close()
-		
+
+    def receive_slave_failure(self):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)         
+	host = socket.gethostname()  
+	print 'receiving failure'             
+	sock.bind((self.host, 10012))
+	global backup_slave_nodes
+	while True:
+		request, addr = sock.recvfrom(1024)
+		#request will be just the slave number
+		dead_slaves = json.loads(request)
+		print 'Recieved dead slaves : '
+		print dead_slaves
+		for slave in dead_slaves:
+			if slave in self.slave_nodes.keys():
+				endpoint = self.slave_nodes[slave]
+				del self.slave_nodes[slave]
+				del self.backup[slave]
+				self.memcache_servers.remove(endpoint)
+				print 'after deletion'+str(self.slave_nodes)
+				#Now add the backup slave nodes
+				self.slave_nodes[slave]=backup_slave_nodes[slave]
+				self.backup[slave]=backup_slave_nodes[slave]
+				self.memcache_servers.append(backup_slave_nodes[slave])
+				print 'after addition'+str(self.slave_nodes)
+				#change the ring using the new slave
+				self.ring = HashRing(self.memcache_servers)
+					
 	
 if __name__ == "__main__":    
 	s=MasterMonitorConnection(10003)
