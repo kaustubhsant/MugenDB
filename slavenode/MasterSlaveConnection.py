@@ -11,6 +11,7 @@ import time
 import traceback
 import os
 from daemon_monitor import Monitor
+from threading import Thread
 
 #intialize logging
 log_filename = 'logs/'+'slave-log.txt'
@@ -18,7 +19,7 @@ logging.basicConfig(filename = log_filename,filemode = 'a',level=logging.DEBUG,f
 logger = logging.getLogger('MasterSlaveConnection.py')
 keylocation = {}
 num_of_requests = 0
-threshold = 5
+threshold = 2000
 
 class MasterSlaveConnection:
     ''' Class to setup listening port and receive requests
@@ -41,11 +42,14 @@ class MasterSlaveConnection:
             for line in myfile:
                 name, endpoint = line.partition("=")[::2]
                 self.monitors[name] = endpoint
+	print self.monitors
         self.pool = ThreadPool(10) #TODO : configure this
 
     def listen(self):
 	print 'listening....' #TODO : log this
 	#self.pool.apply_async(savekeymap,args=(self.keylocation,))
+	thread = Thread(target = self.sendHeartbeat, args = ())
+	thread.start()
 	while True:
    	    request, addr = self.sock.recvfrom(1024)
     	    self.pool.apply_async(ServeRequest, args=(request,self.masters,keylocation))
@@ -56,6 +60,14 @@ class MasterSlaveConnection:
                mon = Monitor(host,int(port),'False')
                mon.senddata('threshold')
                mon.closeconnection
+
+    def sendHeartbeat(self):
+	while True:
+		time.sleep(2) #sends heartbeat every 2 secs
+		print 'sending heartbeat'
+		host,port = self.monitors[getMonitor()].partition(":")[::2]
+		mon = Monitor(host,int(port),'False')
+		mon.senddata('Heartbeat')
 
 def getMonitor():
 	return 'Monitor1'
