@@ -40,11 +40,11 @@ class MasterMonitorConnection:
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	host,port = self.monitors[self.monitors.keys()[0]].split(":")
 	sock.sendto(json.dumps(self.config), (host,int(port)))
-	slave_config = sock.recvfrom(1024)
+	slave_config,addr = self.sock.recvfrom(1024)
 	sock.close()
 	with open("config/slave.txt",'w') as fin:
 		for val in slave_config:
-			fin.write(val)
+			fin.write(str(val))
 
 	with open("config/slave.txt",'r') as myfile:
 		for line in myfile:

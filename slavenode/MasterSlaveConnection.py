@@ -52,6 +52,7 @@ class MasterSlaveConnection:
 	thread.start()
 	while True:
    	    request, addr = self.sock.recvfrom(1024)
+	    req = json.loads(request)
 	    if req['request'] == "New":
 		with open("config/masters.txt",'a') as fin:
 			fin.write(req['data'])
@@ -70,7 +71,7 @@ class MasterSlaveConnection:
     def sendHeartbeat(self):
 	while True:
 		time.sleep(2) #sends heartbeat every 2 secs
-		print 'sending heartbeat'
+		#print 'sending heartbeat'
 		host,port = self.monitors[getMonitor()].partition(":")[::2]
 		mon = Monitor(host,int(port),'False')
 		mon.senddata('Heartbeat')

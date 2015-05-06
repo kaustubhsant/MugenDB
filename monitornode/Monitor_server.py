@@ -52,16 +52,16 @@ def receiveStatus():
 		if returnobj['result'] == "shutdown":
 			masters = {k:v for k,v in masters.items if v.split(":")[0] != addr[0]}
 		elif returnobj['result'] == "New":
-			data = "Master{}={}:{}".format(len(masters),returnobj['host'],returnobj['port'])
+			data = "Master{}={}:{}".format(len(masters)+1,addr[0],returnobj['port'])
 			with open("config/masters.txt",'a') as myfile:
 				myfile.write("{}\n".format(data))
 			with open("config/slave.txt",'r') as fin:
 				slaves = ""
 				for line in fin:
 					slaves = slaves + line	
-				sock.sendto(slaves)
+				sock.sendto(slaves,(addr[0],int(returnobj['port'])))
 			informslaves(data)
-			masters["Master{}".format(len(masters))] = "{}:{}".format(returnobj['host'],returnobj['port'])
+			masters["Master{}".format(len(masters)+1)] = "{}:{}".format(addr[0],returnobj['port'])
 		else:
 			clients[returnobj['userid']].send(str(returnobj['result'])) 
 
