@@ -4,7 +4,7 @@ import json
 from threading import Lock
 
 class MugenDBAPI:
-    def __init__(self,dbfile,keymapfile):
+    def __init__(self,dbfile="MugenDBfile.txt",keymapfile="KeyMap.txt"):
         self.readbuff = {}
         #self.dbfile = "MugenDBfile.txt"
         #self.keymapfile = "KeyMap.txt"
