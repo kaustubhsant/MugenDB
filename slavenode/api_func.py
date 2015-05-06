@@ -4,10 +4,12 @@ import json
 from threading import Lock
 
 class MugenDBAPI:
-    def __init__(self):
+    def __init__(self,dbfile,keymapfile):
         self.readbuff = {}
-        self.dbfile = "MugenDBfile.txt"
-        self.keymapfile = "KeyMap.txt"
+        #self.dbfile = "MugenDBfile.txt"
+        #self.keymapfile = "KeyMap.txt"
+        self.dbfile = dbfile
+        self.keymapfile = keymapfile
 	self.dblock = Lock()
 	self.keymaplock = Lock()
 
