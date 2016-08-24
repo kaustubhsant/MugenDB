@@ -1,1 +1,1 @@
-A distributed Key-Value store NoSQL Database.
+A distributed Key-Value store NoSQL Database engine.
